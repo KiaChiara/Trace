@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Chiara Giustiniani">
+  <title>흔적</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/shaders.js"></script>
+  <script src="js/face.js"></script>
+  <script src="js/states.js"></script>
+  <script src="js/gestures.js"></script>
+  <script src="js/music.js"></script>
+  <script src="js/sketch.js"></script>
+</head>
+<body>
+  <div id="intro" class="panel intro">
+    <h1 lang="ko">흔적</h1>
+    <p>Your face plays this piece. Your expressions shape the music and bend the lines, and every gesture leaves a mark. When you leave, the marks become a portrait of your visit.</p>
+    <p class="note">The camera image stays on this device and is never uploaded. Headphones and Chrome recommended.</p>
+    <button id="start" type="button">Start with camera and sound</button>
+    <p id="status" class="note" role="status" aria-live="polite"></p>
+    <p class="note copyright">© 2026 Chiara Giustiniani. All rights reserved.</p>
+  </div>
+
+  <p id="hint" class="hint" role="status" aria-live="polite" hidden></p>
+
+  <nav id="controls" class="controls" hidden>
+    <button id="end" type="button">End visit</button>
+    <button id="full" type="button">Full screen</button>
+  </nav>
+
+  <section id="end-screen" class="end" hidden>
+    <img id="portrait" alt="The portrait left by your visit: coloured arcs where your gestures happened.">
+    <div class="actions">
+      <a id="download" href="#" download="portrait.png">Download portrait</a>
+      <button id="again" type="button">Start again</button>
+    </div>
+    <p class="note copyright">© 2026 Chiara Giustiniani. All rights reserved.</p>
+  </section>
+</body>
+</html>

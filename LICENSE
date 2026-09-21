@@ -1,0 +1,9 @@
+Copyright (c) 2026 Chiara Giustiniani. All rights reserved.
+
+This repository contains the source code of an artwork by Chiara Giustiniani.
+No permission is granted to copy, modify, distribute, publish, or otherwise use
+this code or the artwork, in whole or in part, without prior written permission
+from the author.
+
+The third-party libraries loaded by the page (p5.js, Tone.js, MediaPipe) belong
+to their respective authors and are used under their own licenses.
