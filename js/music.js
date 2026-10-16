@@ -26,21 +26,18 @@ const Music = {
   },
 
   // iPhone: Safari mutes Web Audio when the phone is on silent.
-  // Both steps must run inside the click, before anything is awaited.
+  // iOS 17+: index.html asks for the 'playback' session before Tone.js loads.
+  // Older iOS: a silent <audio> loop, started inside the click, switches the session.
   keepPlayingOnSilent() {
-    // recent iOS: declare the page as media playback, which ignores the silent switch
-    if (navigator.audioSession) {
-      try { navigator.audioSession.type = 'playback'; } catch (e) { /* not supported */ }
-    }
-    // older iOS: a silent <audio> loop switches the audio session to playback
-    const rate = 8000, samples = rate;                       // 1 second of silence
-    const buf = new ArrayBuffer(44 + samples * 2);
+    // full-quality silence (44.1 kHz, stereo, 16-bit, 0.5 s): low-quality clips are ignored by iOS
+    const rate = 44100, ch = 2, frames = rate / 2, bytes = frames * ch * 2;
+    const buf = new ArrayBuffer(44 + bytes);
     const v = new DataView(buf);
     const text = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
-    text(0, 'RIFF'); v.setUint32(4, 36 + samples * 2, true); text(8, 'WAVE');
-    text(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
-    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
-    text(36, 'data'); v.setUint32(40, samples * 2, true);   // samples stay 0 = silence
+    text(0, 'RIFF'); v.setUint32(4, 36 + bytes, true); text(8, 'WAVE');
+    text(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, ch, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * ch * 2, true); v.setUint16(32, ch * 2, true); v.setUint16(34, 16, true);
+    text(36, 'data'); v.setUint32(40, bytes, true);          // samples stay 0 = silence
     const el = document.createElement('audio');
     el.src = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
     el.loop = true;
