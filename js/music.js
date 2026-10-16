@@ -25,7 +25,33 @@ const Music = {
     return prog[this.M.chordIdx % prog.length].map(n => this.noteNum(n));
   },
 
+  // iPhone: Safari mutes Web Audio when the phone is on silent.
+  // Both steps must run inside the click, before anything is awaited.
+  keepPlayingOnSilent() {
+    // recent iOS: declare the page as media playback, which ignores the silent switch
+    if (navigator.audioSession) {
+      try { navigator.audioSession.type = 'playback'; } catch (e) { /* not supported */ }
+    }
+    // older iOS: a silent <audio> loop switches the audio session to playback
+    const rate = 8000, samples = rate;                       // 1 second of silence
+    const buf = new ArrayBuffer(44 + samples * 2);
+    const v = new DataView(buf);
+    const text = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    text(0, 'RIFF'); v.setUint32(4, 36 + samples * 2, true); text(8, 'WAVE');
+    text(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    text(36, 'data'); v.setUint32(40, samples * 2, true);   // samples stay 0 = silence
+    const el = document.createElement('audio');
+    el.src = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+    el.loop = true;
+    el.setAttribute('playsinline', '');
+    el.setAttribute('x-webkit-airplay', 'deny');
+    el.play().catch(() => { /* not needed on this device */ });
+    this.silentLoop = el;
+  },
+
   async start() {
+    this.keepPlayingOnSilent();
     await Tone.start();
     const limiter = new Tone.Limiter(-3).toDestination();
     this.reverb = new Tone.Reverb({ decay: 6, wet: 0.3 }).connect(limiter);
